@@ -6,7 +6,8 @@ import pandas as pd
 import geopandas as gpd
 from tqdm import tqdm
 
-# Function to download and read CSV from a URL
+
+# Fonction pour télécharger et lire un fichier CSV depuis un URL
 def read_csv_from_url(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -18,10 +19,10 @@ def read_csv_from_url(url):
         return None
 
 
-# Function to download department data
+# Fonction pour télécharger les données météo par département
 def load_department_data(
     department_id,
-    relevant_columns=["DEPARTMENT_ID", "NUM_POSTE", "NOM_USUEL", "LAT", "LON", "AAAAMMJJHH","RR1", "DRR1", "T", "U", "PSTAT"],
+    relevant_columns=["DEPARTMENT_ID", "NUM_POSTE", "NOM_USUEL", "LAT", "LON", "AAAAMMJJHH","RR1", "T"],
     base_url_prefix="https://object.files.data.gouv.fr/meteofrance/data/synchro_ftp/BASE/HOR/H_",
     base_url_suffix="_latest-2023-2024.csv.gz",
 ):
@@ -35,12 +36,12 @@ def load_department_data(
     return df[relevant_columns]
 
 
-# Function to download and save department data iteratively
+# Function pour sauvegarder les données dans un dossier
 def load_and_save_all_department_data(
     department_ids,
     save_dir,
     relevant_columns=["DEPARTMENT_ID", "NUM_POSTE", "NOM_USUEL", "LAT", "LON", 
-                      "AAAAMMJJHH", "RR1", "DRR1", "T", "U", "PSTAT"],
+                      "AAAAMMJJHH", "RR1", "T"],
     base_url_prefix="https://object.files.data.gouv.fr/meteofrance/data/synchro_ftp/BASE/HOR/H_",
     base_url_suffix="_latest-2023-2024.csv.gz",
 ):
@@ -49,7 +50,7 @@ def load_and_save_all_department_data(
         df.to_csv(f"{save_dir}/{_id}.csv", index=False)
 
 
-# Function to load and concatenate data from disk
+# Fonction pour concaténer les bases de données
 def load_data_from_disk(data_dir):
     all_dfs = []
     for file_path in tqdm(glob.glob(f"{data_dir}/*.csv"), desc="Loading and concatenating data from disk"):
