@@ -56,3 +56,17 @@ def load_data_from_disk(data_dir):
     for file_path in tqdm(glob.glob(f"{data_dir}/*.csv"), desc="Loading and concatenating data from disk"):
         all_dfs.append(pd.read_csv(file_path))
     return pd.concat(all_dfs)
+
+
+# Fonction pour créer un dataframe propre ne contenant qu'une seule station
+def station_au_hasard(x, df1):
+    
+    df2 = df1[df1["NOM_USUEL"] == x]
+    # On ne conserve que les colonnes d'intéret
+    df2 = df2[["AAAAMMJJHH", "RR1", "T"]]
+    # On crée une copie pour éviter les intéractions avec le dataframe de base
+    df2 = df2.copy()
+    # On se débarrasse des valeurs manquantes
+    df2 = df2.dropna(subset=['RR1', 'T'])
+
+    return df2
