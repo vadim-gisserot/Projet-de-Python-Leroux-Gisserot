@@ -17,7 +17,7 @@ def carte_figures(df1, df2):
     
     # On crée la carte avec cartopy
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw={'projection': ccrs.Mercator()})
-    ax.set_extent([-6, 10, 41, 52], crs=ccrs.PlateCarree())
+    ax.set_extent([-3, 6, 47, 50.5], crs=ccrs.PlateCarree())
     
     # On ajoute les features de base
     ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
