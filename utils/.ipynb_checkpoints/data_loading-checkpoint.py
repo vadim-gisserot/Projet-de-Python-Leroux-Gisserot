@@ -58,6 +58,17 @@ def load_data_from_disk(data_dir):
     return pd.concat(all_dfs)
 
 
+# Fonction pour nettoyer et organiser le dataframe
+def cleaning_and_organizing(df, columns, date):
+    
+    # On trie les lignes par les colonnes choisies
+    df = df.sort_values(by=columns)
+    # On formatte les dates pour les utiliser ultérieurement dans les graphes
+    df[date] = pd.to_datetime(df[date], format="%Y%m%d%H")
+
+    return df
+
+
 # Fonction pour créer un dataframe propre ne contenant qu'une seule station
 def station_au_hasard(x, df1):
     
@@ -70,3 +81,20 @@ def station_au_hasard(x, df1):
     df2 = df2.dropna(subset=['RR1', 'T'])
 
     return df2
+
+
+# Fonction pour importer la base de données fluviales
+def import_geojson_from_url(geojson_url, geojson_file):
+    
+    response = requests.get(geojson_url)
+    if response.status_code == 200:
+        with open(geojson_file, "wb") as file:
+            file.write(response.content)
+    else:
+        raise Exception("Impossible de télécharger le fichier GeoJSON")
+
+    # on charge le fichier geojson avec geopandas et on retire les géométries invalides
+    riv = gpd.read_file(geojson_file)
+    riv = riv[riv.geometry.notnull()]
+
+    return riv
