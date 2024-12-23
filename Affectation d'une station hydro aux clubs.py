@@ -8,9 +8,6 @@ from scipy.spatial import distance
 
 df_adresses_clubs = pd.read_csv('/home/onyxia/work/Projet-de-Python-Leroux-Gisserot/Datasets/adresses_clubs.csv', sep=';', header=0)
 
-#CRéation d'un datawet restreint pour test et pour gérer les erreurs d'adresses (je suis sure que dans les 2 premières il n'y a pas d'erreur)
-df_adresses_clubs = df_adresses_clubs.head(2)
-
 #Modifcations à apporter dans le fichier CSV
 remplacements = {"Île Lacroix ": "", "Chem.": "Chemin", " Rue Frédéric Ogerau" : "7 Impasse de la Chaussée","bis" : "", "2 Bd du Général Leclerc" : "82 Bd du Général Leclerc", "Complexe sportif de l'île du Pont":"Rue de l'île du Pont" }
 
@@ -19,7 +16,7 @@ colonnes_a_modifier = ["Adresse"]
 df_adresses_clubs['Adresse'] = df_adresses_clubs[colonnes_a_modifier].replace(remplacements)
 
 # Initialiser le géocodeur
-geolocator = Nominatim(user_agent="geoapi")
+geolocator = Nominatim(user_agent="geoapi", timeout=15)
 
 # Fonction pour récupérer les coordonnées
 def get_coordinates(address):
@@ -37,7 +34,6 @@ def get_coordinates(address):
 df_adresses_clubs[['Latitude', 'Longitude']] = df_adresses_clubs['Adresse'].apply(get_coordinates)
 print(df_adresses_clubs)
 
-
 #Création du datasets stations hydrométriques
 df_liste_stations = pd.read_csv('/home/onyxia/work/Projet-de-Python-Leroux-Gisserot/Datasets/liste-stations.csv', sep=';', header=0)
 
@@ -50,7 +46,8 @@ print(df_liste_stations_clean)
 
 # Fonction pour trouver la station la plus proche d'un club d'aviron donné
 def find_nearest_station(lat, lon, stations):
-    
+    # Filtrer les stations dont le libellé contient le mot "Seine"
+    stations = stations[stations['lbstationhydro'].str.contains('Seine', case=False, na=False)]
     coords_station = stations[['latitude', 'longitude']].values
     coords_point = [lat, lon]
     
@@ -80,4 +77,11 @@ df_adresses_clubs = add_station_info_to_clubs(df_adresses_clubs, df_liste_statio
 print(df_adresses_clubs)
 print(df_adresses_clubs['cdentite'])
 
+liste_stations_a_récupérer = []
+for element in df_adresses_clubs['cdentite']:
+    if element not in liste_stations_a_récupérer :
+        liste_stations_a_récupérer.append(element)
+
 #Voila les stations desquelles on doit télécharger l'historique des données hydro à la main
+
+print("Les stations dont il faut récupérer les données dans les archives hydrométriques sont : " + ", ".join(liste_stations_a_récupérer))
