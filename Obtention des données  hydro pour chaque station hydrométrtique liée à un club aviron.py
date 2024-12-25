@@ -119,4 +119,4 @@ for nom, df in dictionnaire_df_stations_hydro.items():
     print(df.head())  # Affiche les 5 premières lignes
     print()  # Ligne vide pour la lisibilité
 
-#On a finalement un dictionner avec tous les dataframes des bases hydro à l'interieur, avec uniquement le débit par heure à chaque station.
+#On a finalement un dictionnaire avec tous les dataframes des bases hydro à l'interieur, avec uniquement le débit par heure à chaque station.
