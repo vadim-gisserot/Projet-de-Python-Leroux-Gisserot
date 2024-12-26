@@ -4,6 +4,9 @@ import requests
 
 import pandas as pd
 import geopandas as gpd
+
+from geopy.geocoders import Nominatim
+from scipy.spatial import distance
 from tqdm import tqdm
 
 
@@ -83,6 +86,24 @@ def station_au_hasard(x, df1):
     return df2
 
 
+# Fonction pour trouver les coordonnées des clubs d'aviron à partir de leurs adresses
+
+def get_coordinates(address):
+    # Initialisation du geocoder
+    geolocator = Nominatim(user_agent="geoapi", timeout=15)
+    
+    try:
+        location = geolocator.geocode(address)
+        if location:
+            return pd.Series([location.latitude, location.longitude])
+        else:
+            return pd.Series([None, None])
+    
+    except Exception as e:
+        print(f"Erreur pour l'adresse {address}: {e}")
+        return pd.Series([None, None])
+
+
 # Fonction pour importer la base de données fluviales
 def import_geojson_from_url(geojson_url, geojson_file):
     
@@ -98,3 +119,36 @@ def import_geojson_from_url(geojson_url, geojson_file):
     riv = riv[riv.geometry.notnull()]
 
     return riv
+
+
+# Fonction pour trouver la station la plus proche d'un club d'aviron donné
+def find_nearest_station(lat, lon, stations, filter_keyword):
+    # Filtrer les stations dont le libellé contient le mot "Seine"
+    if filter_keyword:
+        stations = stations[stations['NOM_USUEL'].str.contains(filter_keyword, case=False, na=False)]
+    coords_station = stations[['LAT', 'LON']].values
+    coords_point = [lat, lon]
+    
+    # Calcul des distances
+    distances = distance.cdist([coords_point], coords_station, metric='euclidean')
+    
+    # Trouver l'index de la station la plus proche
+    nearest_idx = distances.argmin()
+    
+    # Retourner le 'cdentite', 'lbstationhydro', 'LAT', 'LON' de la station la plus proche
+    return stations.iloc[nearest_idx][['NUM_POSTE', 'NOM_USUEL', 'LAT', 'LON']]
+
+
+# Fonction pour créer un nouveau DataFrame avec les stations les plus proches
+def create_nearest_stations_dataframe(df_adresses_clubs, stations, filter_keyword):
+    # Liste pour stocker les informations des stations proches
+    stations_proches = []
+    
+    # Parcourir chaque club pour trouver sa station la plus proche
+    for _, row in df_adresses_clubs.iterrows():
+        station_info = find_nearest_station(row['LAT'], row['LON'], stations, filter_keyword)
+        stations_proches.append(station_info)
+    
+    # Créer un DataFrame avec les informations des stations proches
+    df_stations_proches = pd.DataFrame(stations_proches, columns=['NUM_POSTE', 'NOM_USUEL', 'LAT', 'LON'])
+    return df_stations_proches.drop_duplicates()
