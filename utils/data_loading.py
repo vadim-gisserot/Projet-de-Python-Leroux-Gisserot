@@ -72,20 +72,6 @@ def cleaning_and_organizing(df, columns, date):
     return df
 
 
-# Fonction pour créer un dataframe propre ne contenant qu'une seule station
-def station_au_hasard(x, df1):
-    
-    df2 = df1[df1["NOM_USUEL"] == x]
-    # On ne conserve que les colonnes d'intéret
-    df2 = df2[["AAAAMMJJHH", "RR1", "T"]]
-    # On crée une copie pour éviter les intéractions avec le dataframe de base
-    df2 = df2.copy()
-    # On se débarrasse des valeurs manquantes
-    df2 = df2.dropna(subset=['RR1', 'T'])
-
-    return df2
-
-
 # Fonction pour trouver les coordonnées des clubs d'aviron à partir de leurs adresses
 
 def get_coordinates(address):
@@ -135,20 +121,16 @@ def find_nearest_station(lat, lon, stations, filter_keyword):
     # Trouver l'index de la station la plus proche
     nearest_idx = distances.argmin()
     
-    # Retourner le 'cdentite', 'lbstationhydro', 'LAT', 'LON' de la station la plus proche
-    return stations.iloc[nearest_idx][['NUM_POSTE', 'NOM_USUEL', 'LAT', 'LON']]
+    # Retourner le 'cdentite' et 'lbstationhydro' de la station la plus proche
+    return stations.iloc[nearest_idx]['NUM_POSTE'], stations.iloc[nearest_idx]['NOM_USUEL']
 
 
-# Fonction pour créer un nouveau DataFrame avec les stations les plus proches
-def create_nearest_stations_dataframe(df_adresses_clubs, stations, filter_keyword):
-    # Liste pour stocker les informations des stations proches
-    stations_proches = []
+# Ajout des colonnes d'identification de la station au DataFrame des adresses des clubs
+def add_station_info_to_clubs(df_adresses_clubs, stations, filter_keyword):
+    # Appliquer la fonction à chaque ligne du DataFrame des adresses des clubs
+    def get_station_info(row):
+        return pd.Series(find_nearest_station(row['LAT'], row['LON'], stations, filter_keyword))
     
-    # Parcourir chaque club pour trouver sa station la plus proche
-    for _, row in df_adresses_clubs.iterrows():
-        station_info = find_nearest_station(row['LAT'], row['LON'], stations, filter_keyword)
-        stations_proches.append(station_info)
-    
-    # Créer un DataFrame avec les informations des stations proches
-    df_stations_proches = pd.DataFrame(stations_proches, columns=['NUM_POSTE', 'NOM_USUEL', 'LAT', 'LON'])
-    return df_stations_proches.drop_duplicates()
+    # Appliquer la fonction à chaque ligne
+    df_adresses_clubs[['NUM_POSTE', 'NOM_USUEL']] = df_adresses_clubs.apply(get_station_info, axis=1)
+    return df_adresses_clubs
