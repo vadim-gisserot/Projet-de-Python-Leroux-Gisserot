@@ -152,3 +152,4 @@ def create_nearest_stations_dataframe(df_adresses_clubs, stations, filter_keywor
     # Créer un DataFrame avec les informations des stations proches
     df_stations_proches = pd.DataFrame(stations_proches, columns=['NUM_POSTE', 'NOM_USUEL', 'LAT', 'LON'])
     return df_stations_proches.drop_duplicates()
+
