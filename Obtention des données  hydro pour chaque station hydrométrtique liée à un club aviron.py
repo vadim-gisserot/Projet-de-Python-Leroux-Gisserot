@@ -120,3 +120,69 @@ for nom, df in dictionnaire_df_stations_hydro.items():
     print()  # Ligne vide pour la lisibilité
 
 #On a finalement un dictionnaire avec tous les dataframes des bases hydro à l'interieur, avec uniquement le débit par heure à chaque station.
+
+nom_club = 'Emulation Nautique de Vernon'
+
+def get_station_data_by_club(club_name, df_adresses_clubs, dictionnaire_df_stations_hydro):
+    """
+    Récupère les données de débit de la station hydrométrique associée à un club d'aviron.
+
+    Args:
+        club_name (str): Le nom du club d'aviron.
+        df_adresses_clubs (DataFrame): DataFrame contenant les clubs et leurs stations associées.
+        dictionnaire_df_stations_hydro (dict): Dictionnaire contenant les DataFrames des données de débit.
+
+    Returns:
+        DataFrame or None: Les données de débit de la station associée au club ou None si non trouvé.
+    """
+ # Trouver l'identifiant de la station associée au club
+    station_id = df_adresses_clubs.loc[df_adresses_clubs['Club'] == club_name, 'NUM_POSTE'].values
+    if len(station_id) == 0:
+        print(f"Aucune station associée au club : {club_name}")
+        return None
+
+    station_id = station_id[0]  # Extraire l'identifiant unique
+    
+    # Récupérer les données de la station
+    if station_id in dictionnaire_df_stations_hydro:
+        return dictionnaire_df_stations_hydro[station_id]
+    else:
+        print(f"Aucune donnée de débit trouvée pour la station : {station_id}")
+        return None
+
+
+print(get_station_data_by_club ( nom_club, stations_hydro_clubs, dictionnaire_df_stations_hydro))
+df_debit=get_station_data_by_club ( nom_club, stations_hydro_clubs, dictionnaire_df_stations_hydro)
+
+
+def get_meteo_data_by_club(club_name, df_adresses_clubs, dictionnaire_df_stations_meteo ):
+
+ # Trouver l'identifiant de la station associée au club
+    station_id = df_adresses_clubs.loc[df_adresses_clubs['Club'] == club_name, 'NUM_POSTE'].values
+    if len(station_id) == 0:
+        print(f"Aucune station associée au club : {club_name}")
+        return None
+
+    station_id = station_id[0]  # Extraire l'identifiant unique
+    
+    # Récupérer les données de la station
+    if station_id in dictionnaire_df_stations_meteo:
+        return dictionnaire_df_stations_meteo[station_id]
+    else:
+        print(f"Aucune donnée de débit trouvée pour la station : {station_id}")
+        return None
+
+print(get_meteo_data_by_club ( nom_club , stations_meteo_clubs, dictionnaire_df_stations_meteo))
+
+df_meteo=get_meteo_data_by_club( nom_club, stations_meteo_clubs, dictionnaire_df_stations_meteo)
+
+# Fusionner les DataFrames sur la colonne datetime
+df_combined = pd.merge(df_debit, df_meteo, on='Datetime', how='outer', suffixes=('_debit', '_meteo'))
+
+# Trier les données par datetime et réinitialiser l'index
+df_combined = df_combined.sort_values(by='Datetime').reset_index(drop=True)
+
+df_combined
+df_combined = df_combined.drop_duplicates(subset='Datetime').reset_index(drop=True)
+# Afficher les premières lignes du DataFrame combiné
+print(df_combined)
