@@ -18,7 +18,7 @@ def carte_figures(df1, df2, df3, df4):
     
     # On crée la carte avec cartopy
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw={'projection': ccrs.Mercator()})
-    ax.set_extent([-2.2, 5.8, 48, 50.2], crs=ccrs.PlateCarree())
+    ax.set_extent([-1.8, 5.7, 47.8, 50], crs=ccrs.PlateCarree())
     
     # On ajoute les features de base
     ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
@@ -31,22 +31,24 @@ def carte_figures(df1, df2, df3, df4):
     
     # On ajoute les stations météo (en rouge)
     ax.scatter(
-        df2['LON'], df2['LAT'], color='red', marker='o', s=8, 
+        df2['LON'], df2['LAT'], color='red', marker='o', s=10, 
         transform=ccrs.PlateCarree(), label="Stations météo"
     )
 
     # On ajoute les stations hydro (en vert)
     ax.scatter(
-        df3['LON'], df3['LAT'], color='green', marker='o', s=8, 
+        df3['LON'], df3['LAT'], color='green', marker='o', s=10, 
         transform=ccrs.PlateCarree(), label="Stations hydro"
     )
     
     # On ajoute les clubs d'aviron (en orange)
     ax.scatter(
-        df4['LON'], df4['LAT'], color='orange', marker='o', s=8, 
+        df4['LON'], df4['LAT'], color='orange', marker='o', s=10, 
         transform=ccrs.PlateCarree(), label="Clubs d'aviron"
     )
-    
+
+    plt.title("Clubs d'aviron, stations météorologiques et hydrologiques le long de la Seine")
+    plt.legend()
     plt.show()
 
 
