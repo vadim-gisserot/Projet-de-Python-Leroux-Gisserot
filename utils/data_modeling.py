@@ -52,7 +52,6 @@ def create_features(df):
     rolling_window = 4 * 7 * 24  # 4 semaines en heures
     df["RR1_sum_4w"] = df.groupby("Club")["RR1"].transform(lambda x: x.shift(24).rolling(rolling_window, min_periods=1).sum())
     df["T_mean_4w"] = df.groupby("Club")["T"].transform(lambda x: x.shift(24).rolling(rolling_window, min_periods=1).mean())
-
     df["debit_mean_1d"] = df.groupby("Club")["debit"].transform(lambda x: x.shift(24).rolling(24, min_periods=1).mean())
     
     return df
