@@ -1,3 +1,4 @@
+#Importations des packages nécessaires aux fonctions créées
 import requests
 import warnings
 
