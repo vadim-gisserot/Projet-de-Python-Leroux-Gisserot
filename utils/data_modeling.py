@@ -34,7 +34,7 @@ def plot_correlations(correlations, title):
     plt.figure(figsize=(10, 6))
     plt.plot(windows, corrs, marker="o", linestyle="-", color="b", label="Corrélation")
     plt.title(title, fontsize=14)
-    plt.xlabel("Fenêtre (en heures)", fontsize=12)
+    plt.xlabel("Fenêtre horaire (h))", fontsize=12)
     plt.ylabel("Corrélation", fontsize=12)
     plt.xticks(ticks=windows, labels=[f"{w//24}j" if w % 24 == 0 else f"{w}h" for w in windows], rotation=45)
     plt.grid(True, linestyle="--", alpha=0.7)

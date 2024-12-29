@@ -1,5 +1,5 @@
 #Importations des packages nécessaires aux fonctions créées
-
+import os
 import glob
 import gzip
 import requests
@@ -59,6 +59,19 @@ def load_data_from_disk(data_dir):
     for file_path in tqdm(glob.glob(f"{data_dir}/*.csv"), desc="Loading and concatenating data from disk"):
         all_dfs.append(pd.read_csv(file_path))
     return pd.concat(all_dfs)
+
+
+
+# Fonction pour concaténer les bases de données avec ajout du nom de fichier. 
+# Cette fonction a pour particularoté de rajouetr une colonne avec le nom de la station hydrométrique dont proviennent les données
+def load_data_from_disk_hydro(data_dir):
+    all_dfs = []
+    for file_path in tqdm(glob.glob(f"{data_dir}/*.csv"), desc="Loading and concatenating data from disk"):
+        df = pd.read_csv(file_path) #Lecture de chaque csv et transformation en dataframe
+        file_name = os.path.splitext(os.path.basename(file_path))[0] #Extraction du nom de la station dont il est issu
+        df['NUM_POSTE'] = file_name #Ajout de la colonne
+        all_dfs.append(df)
+    return pd.concat(all_dfs, ignore_index=True)
 
 
 # Fonction pour nettoyer et organiser le dataframe
