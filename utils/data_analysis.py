@@ -69,7 +69,7 @@ def trace_graphique(x, y, titre, xlabel, ylabel):
     plt.show()
 
 
-# Fonction pour tracer les graphiques avec 2 courbes ou plus
+# Fonction pour tracer les graphiques avec 2 courbes 
 def trace_graphique_multiple(x, y_mult, titre, xlabel, ylabel):
 
     plt.figure(figsize=(10, 6))
